@@ -18,11 +18,6 @@ class XMLTestResultTestCase(unittest.TestCase):
         self.assertIsInstance(result, XMLTestResult)
         return result
 
-    def get_text(self, xmltree):
-        xmldoc = StringIO()
-        xmltree.write(xmldoc, encoding="utf-8")
-        return xmldoc.getvalue()
-
     def is_iso8601_time(self, string):
         base, _dot, rest = string.rpartition('.')
         time.strptime(base, "%Y-%m-%dT%H:%M:%S")
@@ -159,6 +154,3 @@ class XMLTestResultTestCase(unittest.TestCase):
                 self.assertEqual(testcase.find("system-out").text, "Hello World!\n")
             else:
                 self.assertEqual(testcase.find("system-err").text, "Hello World!\n")
-
-if __name__ == '__main__':
-    unittest.main()
