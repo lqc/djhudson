@@ -111,9 +111,10 @@ class XMLTestResultTestCase(unittest.TestCase):
         self.assertEqual(suite.get("failures"), "0")
 
         testcase = suite.find("testcase")
-        self.assertIsNotNone(testcase.get("skipped"))
+        skipped = testcase.find("skipped")
+        self.assertEqual(skipped.text, "Because we can!")
 
-    def test_excepted_failures(self):
+    def test_excepted_failure(self):
         class SimpleTestCase(unittest.TestCase):
             @unittest.expectedFailure
             def test_fail(self):
@@ -132,7 +133,7 @@ class XMLTestResultTestCase(unittest.TestCase):
         self.assertEqual(suite.get("failures"), "0")
 
         for testcase in suite.findall("testcase"):
-            self.assertIsNotNone(testcase.get("skipped"))
+            self.assertIsNotNone(testcase.find("skipped"))
 
     def test_output_buffering(self):
         class SimpleTestCase(unittest.TestCase):

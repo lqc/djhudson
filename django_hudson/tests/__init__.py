@@ -4,7 +4,6 @@ from .runners import *
 class MetaTests(unittest.TestCase):
     """
         This test case exists only to see how Hudson displays our reports.
-        One of them will fail ;).
     """
 
     def test_meta_success(self):
@@ -24,6 +23,6 @@ class MetaTests(unittest.TestCase):
     def test_meta_unexpected_success(self):
         self.assertEqual(1, 1, "It works after all!")
 
-    def test_meta_failure(self):
-        self.assertEqual(1, 0,
-            "This test is broken intentionally. Nothing to see here!")
+#    def test_meta_failure(self):
+#        self.assertEqual(1, 0,
+#            "This test is broken intentionally. Nothing to see here!")

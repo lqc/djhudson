@@ -87,14 +87,20 @@ class XMLTestResult(unittest.TextTestResult):
         suite.set("errors", str(len(self.errors)))
         suite.set("time", "%.5f" % total_seconds(datetime.datetime.utcnow() - self._suite_start_time))
 
-        for test, _reason in self.skipped:
-            self._elements[test].set("skipped", "True")
+        for test, reason in self.skipped:
+            elem = etree.Element("skipped")
+            elem.text = reason
+            self._elements[test].append(elem)
 
-        for test, _traceback in self.expectedFailures:
-            self._elements[test].set("skipped", "True")
+        for test, traceback in self.expectedFailures:
+            elem = etree.Element("skipped")
+            elem.text = traceback
+            self._elements[test].append(elem)
 
         for test in self.unexpectedSuccesses:
-            self._elements[test].set("skipped", "True")
+            elem = etree.Element("skipped")
+            elem.text = "This test is expected to fail, but it didn't."
+            self._elements[test].append(elem)
 
         for test, traceback in self.failures:
             testcase = self._elements[test]
