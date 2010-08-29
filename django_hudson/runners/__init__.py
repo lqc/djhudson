@@ -1,5 +1,7 @@
 from __future__ import division
+from django.test.simple import DjangoTestSuiteRunner
 from django_hudson.externals import unittest
+
 from xml.etree import ElementTree as etree
 import datetime
 import itertools
@@ -7,10 +9,10 @@ import itertools
 def total_seconds(td):
     return (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10 ** 6) / 10 ** 6
 
-class XMLTestResult(unittest.TestResult):
+class XMLTestResult(unittest.TextTestResult):
 
     def __init__(self, stream, descriptions, verbosity):
-        super(XMLTestResult, self).__init__()
+        super(XMLTestResult, self).__init__(stream, descriptions, verbosity)
 
         self.successes = []
         self._start_times = {}
@@ -101,3 +103,16 @@ class XMLTestResult(unittest.TestResult):
         for test, traceback in self.errors:
             testcase = self._elements[test]
             testcase.find("error").text = traceback
+
+class HudsonTestSuiteRunner(DjangoTestSuiteRunner):
+
+    def run_suite(self, suite, **kwargs):
+        # we don't need DjangoTestRunner - all the stuff is already there in unittest2
+        return unittest.TextTestRunner(
+                verbosity=self.verbosity,
+                failfast=self.failfast,
+                buffer=True,
+                resultclass=XMLTestResult).run(suite)
+
+    def suite_result(self, suite, result, **kwargs):
+        return result
