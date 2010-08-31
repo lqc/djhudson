@@ -1,4 +1,5 @@
 from django_hudson import plugins
+import sys
 
 class CoveragePlugin(object):
 
@@ -25,6 +26,7 @@ class CoveragePlugin(object):
         self._coverage.stop()
 
         self._coverage.xml_report(
+            morfs=[plugins],
             outfile=self._output_file
         )
 
