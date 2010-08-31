@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.core.management.base import BaseCommand
-from optparse import make_option
+from optparse import make_option, OptionGroup
 import sys
 
 class Command(BaseCommand):
@@ -21,11 +21,14 @@ class Command(BaseCommand):
         from django.conf import settings
         from django.test.utils import get_runner
         from django_hudson.runners import HudsonTestSuiteRunner
+        from django_hudson.plugins import trigger_plugin_signal, get_plugins
 
         verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive', True)
         failfast = options.get('failfast', False)
         TestRunner = get_runner(settings)
+
+        trigger_plugin_signal("configure", options)
 
         if not issubclass(TestRunner, HudsonTestSuiteRunner):
             print 'Your test runner is not a subclass of HudsonTestSuiteRunner (switching to it now).'
@@ -38,5 +41,20 @@ class Command(BaseCommand):
         result = test_runner.run_tests(test_labels)
         result._doc.write(options["xml_report_file"], encoding='utf-8')
 
-        if result.failures:
+        if len(result.failures) + len(result.errors):
             sys.exit(1)
+
+    def create_parser(self, *args):
+        # extend the option list with plugin specific options
+        from django_hudson.plugins import get_plugins
+        parser = super(Command, self).create_parser(*args)
+
+        for plugin in get_plugins():
+            option_group = OptionGroup(parser, getattr(plugin, "name", type(plugin).__name__), "")
+            plugin.add_options(option_group)
+            if option_group.option_list:
+                parser.add_option_group(option_group)
+        return parser
+
+
+

@@ -1,6 +1,7 @@
 from __future__ import division
 from django.test.simple import DjangoTestSuiteRunner
 from django_hudson.externals import unittest
+from django_hudson.plugins import trigger_plugin_signal
 
 from xml.etree import ElementTree as etree
 import datetime
@@ -14,7 +15,6 @@ class XMLTestResult(unittest.TextTestResult):
     def __init__(self, stream, descriptions, verbosity):
         super(XMLTestResult, self).__init__(stream, descriptions, verbosity)
 
-        self.successes = []
         self._start_times = {}
         self._elements = {}
 
@@ -113,12 +113,16 @@ class XMLTestResult(unittest.TextTestResult):
 class HudsonTestSuiteRunner(DjangoTestSuiteRunner):
 
     def run_suite(self, suite, **kwargs):
-        # we don't need DjangoTestRunner - all the stuff is already there in unittest2
-        return unittest.TextTestRunner(
+        test_runner = unittest.TextTestRunner(
                 verbosity=self.verbosity,
                 failfast=self.failfast,
                 buffer=True,
-                resultclass=XMLTestResult).run(suite)
+                resultclass=XMLTestResult)
+
+        trigger_plugin_signal("before_suite_run", suite)
+        result = test_runner.run(suite)
+        trigger_plugin_signal("after_suite_run", suite, result)
+        return result
 
     def suite_result(self, suite, result, **kwargs):
         return result

@@ -5,7 +5,6 @@ from pylint import lint
 from pylint.reporters.text import ParseableTextReporter
 from django.core.management.base import BaseCommand
 
-
 class Command(BaseCommand):
     help = "proccess django application with pylint"
 
@@ -15,7 +14,7 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        output_file=options.get('output_file')
+        output_file = options.get('output_file')
         if output_file:
             output = open(output_file, 'w')
         else:

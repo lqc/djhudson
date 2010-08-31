@@ -2,6 +2,8 @@
 .ve
 .coverage
 *.pyc
-reports
-
-
+test_project/unittests.xml
+test_project/coverage.xml
+.project
+.pydevproject
+.settings
