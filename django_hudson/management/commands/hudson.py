@@ -24,7 +24,7 @@ class Command(BaseCommand):
         from django_hudson.plugins import trigger_plugin_signal
 
         verbosity = int(options.get('verbosity', 1))
-        interactive = options.get('interactive', True)
+        interactive = options.get('interactive', False)
         failfast = options.get('failfast', False)
         TestRunner = get_runner(settings)
 
@@ -36,7 +36,10 @@ class Command(BaseCommand):
 
         test_runner = TestRunner(verbosity=verbosity,
                                  interactive=interactive,
-                                 failfast=failfast)
+                                 failfast=failfast,
+                                 excludes=getattr(settings, 'TEST_EXCLUDES', []))
+
+        # filter test labels
 
         result = test_runner.run_tests(test_labels)
         result._doc.write(options["xml_report_file"], encoding='utf-8')

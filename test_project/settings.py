@@ -85,6 +85,9 @@ TEMPLATE_DIRS = (
 
 INSTALLED_APPS = (
     'django_hudson',
+    'test_project.simple_app',
+    'test_project.excluded_app',
+    'test_project.nocover_app',
 )
 
 try:
@@ -93,3 +96,14 @@ try:
 except ImportError:
     print "No south - not running those tests"
     pass
+
+
+TEST_EXCLUDES = (
+    r'^test_project\.excluded_app\.',
+    r'^south\.',
+    r'^django\.'
+)
+
+TEST_COVERAGE_EXCLUDES = (
+    r'^test_project\.nocover_app\.',
+)

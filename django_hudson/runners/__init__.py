@@ -5,6 +5,7 @@ from django_hudson.plugins import trigger_plugin_signal
 
 import datetime
 import itertools
+import re
 
 def total_seconds(td):
     return (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10 ** 6) / 10 ** 6
@@ -110,10 +111,27 @@ class XMLTestResult(unittest.TextTestResult):
             testcase.find("error").text = traceback
 
 class HudsonTestSuiteRunner(DjangoTestSuiteRunner):
+    def __init__(self, *args, **kwargs):
+        self._excludes = kwargs.pop('excludes')
+        super(HudsonTestSuiteRunner, self).__init__(*args, **kwargs)
 
     def setup_databases(self):
         trigger_plugin_signal("before_database_setup")
         return super(HudsonTestSuiteRunner, self).setup_databases()
+
+    def build_suite(self, test_labels, extra_tests=None, **kwargs):
+        suite = super(HudsonTestSuiteRunner, self).build_suite(test_labels, extra_tests, **kwargs)
+        filtered_suite = unittest.TestSuite()
+        for case in suite:
+            exclude = False
+            print case.id()
+            for expr in self._excludes:
+                if re.match(expr, case.id()):
+                    exclude = True
+                    break
+            if not exclude:
+                filtered_suite.addTest(case)
+        return filtered_suite
 
     def run_suite(self, suite, **kwargs):
         test_runner = unittest.TextTestRunner(

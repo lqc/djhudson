@@ -1,4 +1,4 @@
 #!/bin/sh
 
 cd test_project
-PYTHONPATH=.. python manage.py hudson
+PYTHONPATH=.. python manage.py hudson $*
