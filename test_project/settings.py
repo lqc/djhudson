@@ -99,11 +99,11 @@ except ImportError:
 
 
 TEST_EXCLUDES = (
-    r'^test_project\.excluded_app\.',
-    r'^south\.',
+    r'^test_project\.excluded_app(\.|$)',
+    r'^south(\.|$)',
     r'^django\.'
 )
 
 TEST_COVERAGE_EXCLUDES = (
-    r'^test_project\.nocover_app\.',
+    r'^test_project\.nocover_app',
 )
