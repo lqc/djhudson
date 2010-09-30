@@ -1,4 +1,5 @@
-from .runners import *
+from django_hudson.externals import unittest
+from django_hudson.tests.runners import *
 
 
 class MetaTests(unittest.TestCase):

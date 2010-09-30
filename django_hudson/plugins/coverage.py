@@ -1,10 +1,10 @@
-from __future__ import with_statement
+from __future__ import with_statement, absolute_import
 
 import os.path
 import sys
 import xml.dom.minidom
 
-import django_hudson.plugins
+from django_hudson.plugins import register, DisablePlugin
 from django_hudson.externals import coverage
 
 if coverage:
@@ -15,23 +15,24 @@ if coverage:
         def xml_file(self, cu, analysis):
             super(CoberturaCoverageReporter, self).xml_file(cu, analysis)
 
-            pkg_name, fname = os.path.split(cu.name)
-            pkg_name = pkg_name or '.'
+#            pkg_name, fname = os.path.split(cu.name)
+#            pkg_name = pkg_name or '.'
+#
+#            class_node = self.packages[pkg_name][0][fname.replace('.', '_')]
+#            print class_node, fname, pkg_name
 
-            class_node = self.packages[pkg_name][0][fname.replace('.', '_')]
-            print class_node, fname, pkg_name
-
-@django_hudson.plugins.register
+@register
 class CoveragePlugin(object):
 
     def __init__(self):
         if coverage is None:
-            raise django_hudson.plugins.DisablePlugin("No coverage module.")
+            raise DisablePlugin("No coverage module.")
 
     def configure(self, settings, options):
         self._coverage = coverage.coverage(
             config_file=options["coverage_config_file"],
             branch=options["coverage_measure_branch"],
+            source=settings.INSTALLED_APPS,
             cover_pylib=False,
         )
 
@@ -43,19 +44,18 @@ class CoveragePlugin(object):
 
     def after_suite_run(self, suite, result):
         self._coverage.stop()
-        modules = filter(self.want_module, sys.modules)
+        modules = filter(self.want_module, sys.modules.values())
 
         with open(self._coverage.config.xml_output, "wb") as outfile:
             reporter = CoberturaCoverageReporter(self._coverage,
                                              self._coverage.config.ignore_errors)
             reporter.report(modules,
-                omit_prefixes=self._coverage.config.omit_prefixes,
-                #include=self._coverage.config.include,
-                outfile=outfile
+                outfile=outfile,
+                config=self._coverage.config
             )
 
     def want_module(self, module):
-        if not hasattr(module, __file__):
+        if not module or not hasattr(module, '__file__'):
             return False
 
         # report only modules inside applications

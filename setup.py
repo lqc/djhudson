@@ -22,10 +22,8 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Testing'
     ],
-    install_requires=[
-    ],
-    packages=['django_hudson', 'django_hudson.management', 'django_hudson.management.commands'],
-    package_data={'django_hudson': ['management/commands/pylint.rc']},
+    packages=['django_hudson', 'django_hudson.management', 'django_hudson.management.commands', 'django_hudson.plugins', 'django_hudson.runners'],
+#     package_data={'django_hudson': ['management/commands/pylint.rc']},
     zip_safe=False,
     include_package_data=True
 )

@@ -37,3 +37,6 @@ def trigger_plugin_signal(signal, *args, **kwargs):
         callback = getattr(plugin, signal, None)
         if callback is not None:
             callback(*args, **kwargs)
+
+# import builtin plugins, this will work, 'cause it's at the end
+from . import coverage, south

@@ -111,6 +111,10 @@ class XMLTestResult(unittest.TextTestResult):
 
 class HudsonTestSuiteRunner(DjangoTestSuiteRunner):
 
+    def setup_databases(self):
+        trigger_plugin_signal("before_database_setup")
+        return super(HudsonTestSuiteRunner, self).setup_databases()
+
     def run_suite(self, suite, **kwargs):
         test_runner = unittest.TextTestRunner(
                 verbosity=self.verbosity,

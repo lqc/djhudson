@@ -15,13 +15,13 @@ class Command(BaseCommand):
     help = 'Runs the test suite for the specified applications, or the entire site if no apps are specified.'
     args = '[appname ...]'
 
-    requires_model_validation = False
+    requires_model_validation = True
 
     def handle(self, *test_labels, **options):
         from django.conf import settings
         from django.test.utils import get_runner
         from django_hudson.runners import HudsonTestSuiteRunner
-        from django_hudson.plugins import trigger_plugin_signal, get_plugins
+        from django_hudson.plugins import trigger_plugin_signal
 
         verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive', True)
