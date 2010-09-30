@@ -1,9 +1,8 @@
 from __future__ import division
 from django.test.simple import DjangoTestSuiteRunner
-from django_hudson.externals import unittest
+from django_hudson.externals import unittest, etree
 from django_hudson.plugins import trigger_plugin_signal
 
-from xml.etree import ElementTree as etree
 import datetime
 import itertools
 

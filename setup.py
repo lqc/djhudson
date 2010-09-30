@@ -3,16 +3,16 @@
 from setuptools import setup, find_packages
 
 setup(
-    name = 'django-hudson',
-    version = '0.0.1',
-    author = 'Mikhail Podgurskiy',
-    author_email = 'kmmbvnr@gmail.com',
-    description = 'Plug and play continuous integration with django and hudson',
-    license = 'LGPL',
-    platforms = ['Any'],
-    keywords = ['pyunit', 'unittest', 'testrunner', 'hudson', 'django'],
-    url = 'http://github.com/kmmbvnr/django-hudson',
-    classifiers = [
+    name='django-hudson',
+    version='0.1.0',
+    author='Mikhail Podgurskiy',
+    author_email='kmmbvnr@gmail.com',
+    description='Plug and play continuous integration with django and hudson',
+    license='LGPL',
+    platforms=['Any'],
+    keywords=['pyunit', 'unittest', 'testrunner', 'hudson', 'django'],
+    url='http://github.com/kmmbvnr/django-hudson',
+    classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)',
@@ -23,12 +23,9 @@ setup(
         'Topic :: Software Development :: Testing'
     ],
     install_requires=[
-        'Django>=1.2',
-        'coverage',
-        'pylint',
     ],
-    packages = ['django_hudson', 'django_hudson.management', 'django_hudson.management.commands'],
+    packages=['django_hudson', 'django_hudson.management', 'django_hudson.management.commands'],
     package_data={'django_hudson': ['management/commands/pylint.rc']},
-    zip_safe = False,
-    include_package_data = True
+    zip_safe=False,
+    include_package_data=True
 )

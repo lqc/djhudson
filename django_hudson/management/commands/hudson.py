@@ -1,123 +1,62 @@
 # -*- coding: utf-8 -*-
-import sys, os, pprint
-from os import path
-import coverage
-from optparse import make_option
-from django.conf import settings
 from django.core.management.base import BaseCommand
-from django_hudson.management.commands.lint import Command as pylint
-from django_hudson.xmlrunner import XmlDjangoTestSuiteRunner
-from django_hudson.management.commands.xmltest import patch_for_test_db_setup
+from optparse import make_option, OptionGroup
+import sys
 
 class Command(BaseCommand):
-    help = "Run ci process"
-
     option_list = BaseCommand.option_list + (
-        make_option('--output', dest='output_dir', default='reports',
-                    help='Reports directory'),
         make_option('--noinput', action='store_false', dest='interactive', default=True,
             help='Tells Django to NOT prompt the user for input of any kind.'),
-        make_option('--excludes', dest="excludes", default='',
-            help="""Comma seperated list of words, modules containing those words
-            will be excluded from coverage reports."""),
+        make_option('--failfast', action='store_true', dest='failfast', default=False,
+            help='Tells Django to stop running the test suite after first failed test.'),
+        make_option('--test-report', dest='xml_report_file', default="unittests.xml",
+            help='File to which jUnit report should be written.')
     )
+    help = 'Runs the test suite for the specified applications, or the entire site if no apps are specified.'
+    args = '[appname ...]'
+
+    requires_model_validation = False
 
     def handle(self, *test_labels, **options):
-        """
-        Run pylint and test with coverage and xml reports
-        """
-        patch_for_test_db_setup()
+        from django.conf import settings
+        from django.test.utils import get_runner
+        from django_hudson.runners import HudsonTestSuiteRunner
+        from django_hudson.plugins import trigger_plugin_signal, get_plugins
 
         verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive', True)
-        excludes = options.get('excludes', '').split(',')
-        excludes = [ exclude.strip() for exclude in excludes ]
+        failfast = options.get('failfast', False)
+        TestRunner = get_runner(settings)
 
-        tasks = getattr(settings, 'HUDSON_TASKS',
-                        ['pylint', 'coverage', 'tests'])
+        trigger_plugin_signal("configure", settings, options)
 
-        output_dir=options.get('output_dir')
-        if not path.exists(output_dir):
-            os.makedirs(output_dir)
+        if not issubclass(TestRunner, HudsonTestSuiteRunner):
+            print 'Your test runner is not a subclass of HudsonTestSuiteRunner (switching to it now).'
+            TestRunner = HudsonTestSuiteRunner
 
-        if not test_labels:
-            test_labels = Command.test_labels()
+        test_runner = TestRunner(verbosity=verbosity,
+                                 interactive=interactive,
+                                 failfast=failfast)
 
-        if verbosity > 0:
-            pprint.pprint("Testing and covering the following apps:\n%s" % (test_labels, ))
+        result = test_runner.run_tests(test_labels)
+        result._doc.write(options["xml_report_file"], encoding='utf-8')
 
-        #TODO: Make lint work and with external rc file
-        if 'pylint' in tasks:
-            pylint().handle(*test_labels,
-                             output_file=path.join(output_dir,'pylint.report'))
+        trigger_plugin_signal("report", result, test_labels)
 
-        if 'coverage' in tasks:
-            coverage.exclude('#pragma[: ]+[nN][oO] [cC][oO][vV][eE][rR]')
-            coverage.start()
-        
-        failures = 0
-        if 'tests' in tasks:
-            test_runner = XmlDjangoTestSuiteRunner(output_dir=output_dir, interactive=interactive, verbosity=verbosity)
-            failures = test_runner.run_tests(test_labels)
+        if len(result.failures) + len(result.errors):
+            sys.exit(1)
 
-        #save coverage report
-        if 'coverage' in tasks:
-            coverage.stop()
+    def create_parser(self, *args):
+        # extend the option list with plugin specific options
+        from django_hudson.plugins import get_plugins
+        parser = super(Command, self).create_parser(*args)
 
-        modules = [ module for name, module in sys.modules.items() \
-                    if self.want_module(name, module, test_labels, excludes)
-        ]
-        morfs = [ self.src(m.__file__) for m in modules if self.src(m.__file__).endswith(".py")]
+        for plugin in get_plugins():
+            option_group = OptionGroup(parser, getattr(plugin, "name", type(plugin).__name__), "")
+            plugin.add_options(option_group)
+            if option_group.option_list:
+                parser.add_option_group(option_group)
+        return parser
 
-        if verbosity > 0:
-            if excludes:
-                print "Excluding any module containing of these words:"
-                pprint.pprint(excludes)
 
-            print "Coverage being generated for:"
-            pprint.pprint(morfs)
 
-        if 'coverage' in tasks:
-            coverage._the_coverage.xml_report(morfs, outfile=path.join(output_dir,'coverage.xml'))
-
-        if failures:
-            sys.exit(bool(failures))
-
-    def want_module(self, modname, mod, test_labels=[], excludes=[]):
-        #No cover if it ain't got a file
-        if not hasattr(mod, "__file__"): return False
-
-        #If it's not being explicity excluded
-        for exclude in excludes:
-            if exclude and exclude in modname:
-                return False
-
-        if test_labels:
-            #If it's one of the explicit test labels called for
-            for label in test_labels:
-                if label and label in modname:
-                    return True
-            return False
-        return True
-
-    def src(self, filename):
-        """Find the python source file for a .pyc, .pyo or $py.class file on
-        jython. Returns the filename provided if it is not a python source
-        file. Cribbed from nose.util
-        """
-        if filename is None:
-            return filename
-        if sys.platform.startswith('java') and filename.endswith('$py.class'):
-            return '.'.join((filename[:-9], 'py'))
-        base, ext = os.path.splitext(filename)
-        if ext in ('.pyc', '.pyo', '.py'):
-            return '.'.join((base, 'py'))
-        return filename
-
-    @staticmethod
-    def test_labels():
-        apps = settings.INSTALLED_APPS
-        if hasattr(settings, 'PROJECT_APPS'):
-            apps = settings.PROJECT_APPS
-        excludes = getattr(settings, 'TEST_EXCLUDES', [])
-        return [app for app in  apps if app not in excludes ]
