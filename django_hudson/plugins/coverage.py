@@ -51,7 +51,11 @@ if coverage:
 
         def create_sources_definition(self):
             self.sources_element = self.create_element("sources")
-            self.sources_map = {}
+            for path in sys.path:
+                e = self.create_element("source")
+                e.appendChild(self.document.createTextNode(path))
+                self.sources_element.appendChild(e)
+            # self.sources_map = {}
             return self.sources_element
 
         def create_packages_definition(self):
@@ -124,6 +128,7 @@ if coverage:
             outfile.write(self.document.toprettyxml())
 
         def generate_document(self, morfs, config):
+            print sys.path
             self.document = self.create_document()
             self.coverage_element = self.document.documentElement
             self.coverage_element.appendChild(self.create_sources_definition())
@@ -162,12 +167,21 @@ if coverage:
                 self.packages_map[pkgname] = package_element, classes_element, classes_map
                 self.packages_element.appendChild(package_element)
 
+            filename = None
+            for path in sys.path:
+                relative = os.path.relpath(cu.filename, path)
+                if not relative.startswith('..'):
+                    filename = relative
+                    break
+            if filename is None:
+                filename = cu.name
+
             # TODO
             try:
                 class_element, lines_element, metadata = classes_map[classname]
             except KeyError:
                 class_element, lines_element = self.create_empty_class(
-                            name=classname, filename=cu.filename, complexity=0)
+                            name=classname, filename=filename, complexity=0)
                 metadata = {}
                 classes_map[classname] = class_element, lines_element, metadata
                 classes_element.appendChild(class_element)
