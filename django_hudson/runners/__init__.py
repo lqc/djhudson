@@ -120,6 +120,7 @@ class HudsonTestSuiteRunner(DjangoTestSuiteRunner):
         return super(HudsonTestSuiteRunner, self).setup_databases()
 
     def build_suite(self, test_labels, extra_tests=None, **kwargs):
+        trigger_plugin_signal("before_suite_build", test_labels)
         suite = super(HudsonTestSuiteRunner, self).build_suite(test_labels, extra_tests, **kwargs)
         filtered_suite = unittest.TestSuite()
         for case in suite:

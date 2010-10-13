@@ -128,7 +128,6 @@ if coverage:
             outfile.write(self.document.toprettyxml())
 
         def generate_document(self, morfs, config):
-            print sys.path
             self.document = self.create_document()
             self.coverage_element = self.document.documentElement
             self.coverage_element.appendChild(self.create_sources_definition())
@@ -143,7 +142,6 @@ if coverage:
             self.coverage_element.setAttribute("branches-valid", unicode(branches[0]))
             self.coverage_element.setAttribute("branches-covered", unicode(branches[0] - branches[1]))
             self.coverage_element.setAttribute("branch-rate", self.rate(*branches))
-
 
         def report_code_unit(self, cu, analysis):
             """
@@ -226,6 +224,7 @@ class CoveragePlugin(object):
         )
 
         self._output_file = options["coverage_report_file"]
+        self._html_dir = options["coverage_html_report_dir"]
 
         def excluded(app):
             for expr in getattr(settings, 'TEST_EXCLUDES', []):
@@ -235,13 +234,15 @@ class CoveragePlugin(object):
                 if re.match(expr, app):
                     return True
             return False
-        self.cover_apps = [app for app in settings.INSTALLED_APPS if not excluded(app)]
+        self.cover_apps = set([app for app in settings.INSTALLED_APPS if not excluded(app)])
 
-    def before_suite_run(self, suite):
+    def before_suite_run(self, *args, **kwargs):
+        self._coverage.erase()
         self._coverage.start()
 
     def after_suite_run(self, suite, result):
         self._coverage.stop()
+        self._coverage.save()
 
         modules = filter(partial(self.want_module, suite), sys.modules.values())
 
@@ -253,7 +254,10 @@ class CoveragePlugin(object):
                 config=self._coverage.config
             )
 
-    def want_module(self, allowed_apps, module):
+        if self._html_dir:
+            self._coverage.html_report(modules, directory=self._html_dir)
+
+    def want_module(self, suite, module):
         if not module or not hasattr(module, '__file__'):
             return False
 
@@ -273,3 +277,7 @@ class CoveragePlugin(object):
                 action="store_false", default=True,
                 dest="coverage_measure_branch",
                 help="Don't measure branch coverage.")
+        group.add_option("--coverage-html-report",
+                dest="coverage_html_report_dir",
+                default="",
+                help="Directory to which HTML coverage report should be written. If not specified, no report is generated.")
