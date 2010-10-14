@@ -16,7 +16,7 @@ class Command(BaseCommand):
     help = 'Runs the test suite for the specified applications, or the entire site if no apps are specified.'
     args = '[appname ...]'
 
-    requires_model_validation = True
+    requires_model_validation = False
 
     def handle(self, *test_labels, **options):
         from django.conf import settings

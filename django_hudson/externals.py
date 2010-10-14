@@ -1,11 +1,12 @@
 """
     Compatibility hacks for external modules.
 """
-import sys
+try:
+    import coverage
+except ImportError:
+    coverage = None
 
-__all__ = [
-    'unittest'
-]
+import sys
 
 if sys.version[:3] < (2, 7):
     try:
@@ -19,11 +20,6 @@ else:
     import unittest
 
 try:
-    import coverage
-except ImportError:
-    coverage = None
-
-try:
     # First try LXML
     from lxml import etree
 except ImportError:
@@ -33,5 +29,10 @@ except ImportError:
         print >> sys.stderr, """ERROR: Couldn't find ElementTree package, which is required for XML reporting."""
         sys.exit(1)
 
+__all__ = (
+    'unittest',
+    'coverage',
+    'etree'
+)
 
 

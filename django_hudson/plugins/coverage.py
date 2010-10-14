@@ -227,6 +227,8 @@ class CoveragePlugin(object):
         self._html_dir = options["coverage_html_report_dir"]
 
         def excluded(app):
+            if app.startswith("django_hudson") and not options["X_cover_django_hudson"]:
+                return True
             for expr in getattr(settings, 'TEST_EXCLUDES', []):
                 if re.match(expr, app):
                     return True
@@ -236,13 +238,11 @@ class CoveragePlugin(object):
             return False
         self.cover_apps = set([app for app in settings.INSTALLED_APPS if not excluded(app)])
 
-    def before_suite_run(self, *args, **kwargs):
-        self._coverage.erase()
+    def before_suite_build(self, *args, **kwargs):
         self._coverage.start()
 
     def after_suite_run(self, suite, result):
         self._coverage.stop()
-        self._coverage.save()
 
         modules = filter(partial(self.want_module, suite), sys.modules.values())
 
@@ -266,6 +266,11 @@ class CoveragePlugin(object):
 
 
     def add_options(self, group):
+        group.add_option("--X-cover-self",
+                dest="X_cover_django_hudson",
+                action="store_true", default=False,
+                help="Should django_hudson report coverage of itself. This usually makes no sense,"
+                " so it's disabled by default.")
         group.add_option("--coverage-output",
                 dest="coverage_report_file",
                 default="coverage.xml",
