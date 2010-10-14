@@ -4,6 +4,8 @@
 *.pyc
 test_project/unittests.xml
 test_project/coverage.xml
+test_project/htmlcov
 .project
 .pydevproject
 .settings
+pylint_*
