@@ -134,6 +134,11 @@ if coverage:
             self.coverage_element.appendChild(self.create_packages_definition())
 
             self.report_files(self.report_code_unit, morfs, config)
+
+            # append packages in ordered fashion
+            for _, info in sorted(self.packages_map.iteritems(), key=lambda x: x[0]):
+                self.packages_element.appendChild(info[0])
+
             lines, branches = self.aggregate_packages()
 
             self.coverage_element.setAttribute("lines-valid", unicode(lines[0]))
@@ -163,7 +168,7 @@ if coverage:
                 package_element, classes_element = self.create_empty_package(name=pkgname)
                 classes_map = {}
                 self.packages_map[pkgname] = package_element, classes_element, classes_map
-                self.packages_element.appendChild(package_element)
+
 
             filename = None
             for path in sys.path:
