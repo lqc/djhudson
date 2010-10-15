@@ -106,4 +106,6 @@ TEST_EXCLUDES = (
 
 TEST_COVERAGE_EXCLUDES = (
     r'^test_project\.nocover_app',
+    r'[\w.]+\.tests$',
+    r'[\w.]+\.migrations(\.|$)',
 )

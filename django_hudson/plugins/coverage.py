@@ -230,6 +230,7 @@ class CoveragePlugin(object):
 
         self._output_file = options["coverage_report_file"]
         self._html_dir = options["coverage_html_report_dir"]
+        self.coverage_excludes = getattr(settings, 'TEST_COVERAGE_EXCLUDES', [])
 
         def excluded(app):
             if app.startswith("django_hudson") and not options["X_cover_django_hudson"]:
@@ -237,7 +238,7 @@ class CoveragePlugin(object):
             for expr in getattr(settings, 'TEST_EXCLUDES', []):
                 if re.match(expr, app):
                     return True
-            for expr in getattr(settings, 'TEST_COVERAGE_EXCLUDES', []):
+            for expr in self.coverage_excludes:
                 if re.match(expr, app):
                     return True
             return False
@@ -265,10 +266,15 @@ class CoveragePlugin(object):
     def want_module(self, suite, module):
         if not module or not hasattr(module, '__file__'):
             return False
+        # report only modules inside installed applications
+        if not any(module.__name__.startswith(app) for app in self.cover_apps):
+            return False
 
-        # report only modules inside installed applications        
-        return any(module.__name__.startswith(app) for app in self.cover_apps)
+        for expr in self.coverage_excludes:
+            if re.match(expr, module.__name__):
+                return False
 
+        return True
 
     def add_options(self, group):
         group.add_option("--X-cover-self",
