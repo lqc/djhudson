@@ -104,7 +104,13 @@ class XMLTestResult(unittest.TextTestResult):
 
         for test, traceback in self.failures:
             testcase = self._elements[test]
-            testcase.find("failure").text = traceback
+            failure = testcase.find("failure")
+            if failure is None:
+                failure = etree.Element("failure")
+                failure.set("type", "Exception")
+                failure.set("message", "")
+                testcase.append(failure)
+            failure.text = traceback
 
         for test, traceback in self.errors:
             testcase = self._elements[test]
