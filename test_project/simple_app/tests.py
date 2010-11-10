@@ -1,3 +1,4 @@
+# -*- coding: utf-8
 from django_hudson.externals import unittest
 
 class MetaTests(unittest.TestCase):
@@ -7,6 +8,12 @@ class MetaTests(unittest.TestCase):
 
     def test_meta_success(self):
         self.assertTrue(True)
+
+    def test_nonascii_string_failue(self):
+        raise Exception("Gąska i Gżegżółka")
+
+    def test_nonascii_string_assert(self):
+        self.fail("Gąska i Gżegżółka")
 
     @unittest.skip("This test is skipped!")
     def test_meta_skipping(self):
@@ -21,6 +28,7 @@ class MetaTests(unittest.TestCase):
     @unittest.expectedFailure
     def test_meta_unexpected_success(self):
         self.assertEqual(1, 1, "It works after all!")
+
 
 class BrokenTestCase(unittest.TestCase):
 

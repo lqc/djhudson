@@ -2,6 +2,7 @@ from __future__ import division
 from django.test.simple import DjangoTestSuiteRunner
 from django_hudson.externals import unittest, etree
 from django_hudson.plugins import trigger_plugin_signal
+from django.utils.encoding import smart_unicode
 
 import datetime
 import itertools
@@ -37,7 +38,7 @@ class XMLTestResult(unittest.TextTestResult):
         testcase = self._testcase(test)
         failure = etree.Element("error")
         failure.set("type", err[0].__name__)
-        failure.set("message", str(err[1]))
+        failure.set("message", smart_unicode(err[1]))
         testcase.append(failure)
         self._elements[test] = testcase
 
@@ -46,7 +47,7 @@ class XMLTestResult(unittest.TextTestResult):
         testcase = self._testcase(test)
         failure = etree.Element("failure")
         failure.set("type", err[0].__name__)
-        failure.set("message", str(err[1]))
+        failure.set("message", smart_unicode(err[1]))
         testcase.append(failure)
         self._elements[test] = testcase
 
@@ -110,11 +111,17 @@ class XMLTestResult(unittest.TextTestResult):
                 failure.set("type", "Exception")
                 failure.set("message", "")
                 testcase.append(failure)
-            failure.text = traceback
+            failure.text = smart_unicode(traceback)
 
         for test, traceback in self.errors:
             testcase = self._elements[test]
-            testcase.find("error").text = traceback
+            failure = testcase.find("error") 
+            if failure is None:
+                failure = etree.Element("error")
+                failure.set("type", "Exception")
+                failure.set("message", "")
+                testcase.append(failure)
+            failure.text = smart_unicode(traceback)
 
 class HudsonTestSuiteRunner(DjangoTestSuiteRunner):
     def __init__(self, *args, **kwargs):
