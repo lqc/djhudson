@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-hudson',
-    version='0.1.0',
+    version='0.2.0-alpha1',
     author='Mikhail Podgurskiy',
     author_email='kmmbvnr@gmail.com',
     description='Plug and play continuous integration with django and hudson',
