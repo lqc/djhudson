@@ -21,7 +21,6 @@ class XMLTestResult(unittest.TextTestResult):
 
     def startTestRun(self):
         super(XMLTestResult, self).startTestRun()
-        self.buffer = True
 
         elem = etree.Element("testsuite")
         self._suite_start_time = datetime.datetime.utcnow()
@@ -59,16 +58,16 @@ class XMLTestResult(unittest.TextTestResult):
         testcase = self._elements[test]
         testcase.set("time", "%.5f" % total_seconds(endtime - self._start_times[test]))
 
-        if self.buffer:
-            stdout = etree.Element("system-out")
-            stdout.text = self._stdout_buffer.getvalue()
-            testcase.append(stdout)
-            stderr = etree.Element("system-err")
-            stderr.text = self._stderr_buffer.getvalue()
-            testcase.append(stderr)
-
-            # never output to stdout
-            self._mirrorOutput = False
+#        if self.buffer:
+#            stdout = etree.Element("system-out")
+#            stdout.text = self._stdout_buffer.getvalue()
+#            testcase.append(stdout)
+#            stderr = etree.Element("system-err")
+#            stderr.text = self._stderr_buffer.getvalue()
+#            testcase.append(stderr)
+#
+#            # never output to stdout
+#            self._mirrorOutput = False
 
         self._suite.append(testcase)
         super(XMLTestResult, self).stopTest(test)
@@ -115,7 +114,7 @@ class XMLTestResult(unittest.TextTestResult):
 
         for test, traceback in self.errors:
             testcase = self._elements[test]
-            failure = testcase.find("error") 
+            failure = testcase.find("error")
             if failure is None:
                 failure = etree.Element("error")
                 failure.set("type", "Exception")
@@ -151,7 +150,7 @@ class HudsonTestSuiteRunner(DjangoTestSuiteRunner):
         test_runner = unittest.TextTestRunner(
                 verbosity=self.verbosity,
                 failfast=self.failfast,
-                buffer=True,
+                buffer=False,
                 resultclass=XMLTestResult)
 
         trigger_plugin_signal("before_suite_run", suite)
