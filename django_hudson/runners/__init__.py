@@ -137,7 +137,6 @@ class HudsonTestSuiteRunner(DjangoTestSuiteRunner):
         filtered_suite = unittest.TestSuite()
         for case in suite:
             exclude = False
-            print case.id()
             for expr in self._excludes:
                 if re.match(expr, case.id()):
                     exclude = True
