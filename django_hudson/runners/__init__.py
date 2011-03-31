@@ -135,6 +135,7 @@ class HudsonTestSuiteRunner(DjangoTestSuiteRunner):
         trigger_plugin_signal("before_suite_build", test_labels)
         suite = super(HudsonTestSuiteRunner, self).build_suite(test_labels, extra_tests, **kwargs)
         filtered_suite = unittest.TestSuite()
+        print '\n'.join(repr(x) for x in suite)
         for case in suite:
             exclude = False
             for expr in self._excludes:

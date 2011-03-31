@@ -54,7 +54,6 @@ class XMLTestResultTestCase(unittest.TestCase):
         self.assertEqual(suite.get("errors"), "0")
         self.assertEqual(suite.get("failures"), "0")
         testcase = suite.find("testcase")
-        etree.dump(testcase)
         self.assertEqual(testcase.get("name"), "test_success")
         self.assertEqual(testcase.get("classname"), "hudson.tests.SimpleTestCase")
         self.assertGreaterEqual(float(testcase.get("time")), 0)

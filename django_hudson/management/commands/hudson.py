@@ -32,8 +32,7 @@ class Command(BaseCommand):
         trigger_plugin_signal("configure", settings, options)
 
         if not issubclass(TestRunner, HudsonTestSuiteRunner):
-            print 'Your test runner is not a subclass of HudsonTestSuiteRunner (switching to it now).'
-            TestRunner = HudsonTestSuiteRunner
+            TestRunner = type("DynamicHudsonRunner", (HudsonTestSuiteRunner, TestRunner), {})
 
         test_runner = TestRunner(verbosity=verbosity,
                                  interactive=interactive,
