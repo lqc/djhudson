@@ -1,17 +1,18 @@
 #!/usr/bin/env python
+# -*- coding: utf-8
 
 from setuptools import setup, find_packages
 
 setup(
-    name='django-hudson',
-    version='0.2.0-alpha2',
-    author='Mikhail Podgurskiy',
-    author_email='kmmbvnr@gmail.com',
+    name='djhudson',
+    version='0.1',
+    author='Łukasz Rekucki',
+    author_email='lrekucki@gmail.com',
     description='Plug and play continuous integration with django and hudson',
     license='LGPL',
     platforms=['Any'],
-    keywords=['pyunit', 'unittest', 'testrunner', 'hudson', 'django'],
-    url='http://github.com/kmmbvnr/django-hudson',
+    keywords=['unittest', 'testrunner', 'hudson', 'django'],
+    url='http://github.com/lqc/djhudson',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
