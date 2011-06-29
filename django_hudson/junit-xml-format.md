@@ -46,11 +46,3 @@ Children:
   
 <error> and <failure> have a "message" attribute which is a short description, "type" which
 is the type of failure. Full stacktrace should be contained in their text as CDATA
- 
-  
-  
-  
- 
- 
- 
-

@@ -1,5 +1,5 @@
 # -*- coding: utf-8
-from django_hudson.externals import unittest
+from django.utils import unittest
 
 class MetaTests(unittest.TestCase):
     """

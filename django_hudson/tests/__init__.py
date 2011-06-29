@@ -1,4 +1,4 @@
-from django_hudson.externals import unittest
+from django.utils import unittest
 from django_hudson.tests.runners import *
 
 class ExcludesTests(unittest.TestCase):

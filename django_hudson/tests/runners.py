@@ -1,4 +1,4 @@
-from django_hudson.externals import unittest
+from django.utils import unittest
 from django_hudson.runners import XMLTestResult
 from cStringIO import StringIO
 import time
@@ -9,12 +9,12 @@ from xml.etree import ElementTree as etree
 class XMLTestResultTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.buffer = StringIO()
-        self.runner = unittest.TextTestRunner(stream=self.buffer, resultclass=XMLTestResult)
+        self.__buffer = StringIO()
+        self.__runner = unittest.TextTestRunner(stream=self.__buffer, resultclass=XMLTestResult)
 
     def run_testcase(self, test_case_class):
         suite = unittest.TestLoader().loadTestsFromTestCase(test_case_class)
-        result = self.runner.run(suite)
+        result = self.__runner.run(suite)
         self.assertIsInstance(result, XMLTestResult)
         return result
 
@@ -40,7 +40,6 @@ class XMLTestResultTestCase(unittest.TestCase):
         self.assertEqual(suite.get("errors"), "0")
         self.assertEqual(suite.get("failures"), "0")
         self.assertTrue(self.is_iso8601_time(suite.get("timestamp")))
-
 
     def test_success(self):
         class SimpleTestCase(unittest.TestCase):
@@ -133,7 +132,6 @@ class XMLTestResultTestCase(unittest.TestCase):
         for testcase in suite.findall("testcase"):
             self.assertIsNotNone(testcase.find("skipped"))
 
-    @unittest.expectedFailure
     def test_output_buffering(self):
         class SimpleTestCase(unittest.TestCase):
             def test_noisy_stdout(self):
@@ -142,6 +140,7 @@ class XMLTestResultTestCase(unittest.TestCase):
                 import sys
                 print >> sys.stderr, "Hello World!"
         SimpleTestCase.__module__ = "hudson.tests"
+        self.__runner.buffer = True
 
         result = self.run_testcase(SimpleTestCase)
         suite = result._suite

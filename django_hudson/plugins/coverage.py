@@ -150,7 +150,7 @@ if coverage:
 
         def report_code_unit(self, cu, analysis):
             """
-                Add information about a single code unit to the report.                                
+                Add information about a single code unit to the report.
             """
             classname = cu.modname
             if classname.endswith("."):
@@ -168,7 +168,6 @@ if coverage:
                 package_element, classes_element = self.create_empty_package(name=pkgname)
                 classes_map = {}
                 self.packages_map[pkgname] = package_element, classes_element, classes_map
-
 
             filename = None
             for path in sys.path:

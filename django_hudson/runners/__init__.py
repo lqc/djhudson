@@ -1,8 +1,9 @@
 from __future__ import division
 from django.test.simple import DjangoTestSuiteRunner
-from django_hudson.externals import unittest, etree
-from django_hudson.plugins import trigger_plugin_signal
+from django.utils import unittest
 from django.utils.encoding import smart_unicode
+from django_hudson.externals import etree
+from django_hudson.plugins import trigger_plugin_signal
 
 import datetime
 import itertools
@@ -15,7 +16,6 @@ class XMLTestResult(unittest.TextTestResult):
 
     def __init__(self, stream, descriptions, verbosity):
         super(XMLTestResult, self).__init__(stream, descriptions, verbosity)
-
         self._start_times = {}
         self._elements = {}
 
@@ -58,16 +58,13 @@ class XMLTestResult(unittest.TextTestResult):
         testcase = self._elements[test]
         testcase.set("time", "%.5f" % total_seconds(endtime - self._start_times[test]))
 
-#        if self.buffer:
-#            stdout = etree.Element("system-out")
-#            stdout.text = self._stdout_buffer.getvalue()
-#            testcase.append(stdout)
-#            stderr = etree.Element("system-err")
-#            stderr.text = self._stderr_buffer.getvalue()
-#            testcase.append(stderr)
-#
-#            # never output to stdout
-#            self._mirrorOutput = False
+        if self.buffer:
+            stdout = etree.Element("system-out")
+            stdout.text = self._stdout_buffer.getvalue()
+            testcase.append(stdout)
+            stderr = etree.Element("system-err")
+            stderr.text = self._stderr_buffer.getvalue()
+            testcase.append(stderr)
 
         self._suite.append(testcase)
         super(XMLTestResult, self).stopTest(test)
@@ -122,6 +119,14 @@ class XMLTestResult(unittest.TextTestResult):
                 testcase.append(failure)
             failure.text = smart_unicode(traceback)
 
+def flattened_suite(suite):
+    for item in suite:
+        if hasattr(item, "id"):
+            yield item
+        else:
+            for subitem in flattened_suite(item):
+                yield subitem
+
 class HudsonTestSuiteRunner(DjangoTestSuiteRunner):
     def __init__(self, *args, **kwargs):
         self._excludes = kwargs.pop('excludes')
@@ -135,8 +140,7 @@ class HudsonTestSuiteRunner(DjangoTestSuiteRunner):
         trigger_plugin_signal("before_suite_build", test_labels)
         suite = super(HudsonTestSuiteRunner, self).build_suite(test_labels, extra_tests, **kwargs)
         filtered_suite = unittest.TestSuite()
-        print '\n'.join(repr(x) for x in suite)
-        for case in suite:
+        for case in flattened_suite(suite):
             exclude = False
             for expr in self._excludes:
                 if re.match(expr, case.id()):
@@ -150,7 +154,7 @@ class HudsonTestSuiteRunner(DjangoTestSuiteRunner):
         test_runner = unittest.TextTestRunner(
                 verbosity=self.verbosity,
                 failfast=self.failfast,
-                buffer=False,
+                buffer=kwargs.pop('buffer', False),
                 resultclass=XMLTestResult)
 
         trigger_plugin_signal("before_suite_run", suite)
