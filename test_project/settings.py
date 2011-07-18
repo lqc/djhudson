@@ -97,11 +97,19 @@ except ImportError:
     print "No south - not running those tests"
     pass
 
+try:
+    import djcelery
+    INSTALLED_APPS = ('djcelery', 'test_project.app_with_celery') + INSTALLED_APPS
+    CELERY_ALWAYS_EAGER = False
+except ImportError:
+    print "No django-celery, skipping tests."
+    pass
 
 TEST_EXCLUDES = (
     r'^test_project\.excluded_app(\.|$)',
     r'^south(\.|$)',
     r'^django\.'
+    r'^djcelery\.'
 )
 
 TEST_COVERAGE_EXCLUDES = (

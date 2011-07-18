@@ -10,3 +10,4 @@ test_project/htmlcov
 .settings
 pylint_*
 djhudson.egg-info
+dist

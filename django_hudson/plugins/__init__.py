@@ -39,4 +39,4 @@ def trigger_plugin_signal(signal, *args, **kwargs):
             callback(*args, **kwargs)
 
 # import builtin plugins, this will work, 'cause it's at the end
-from . import coverage, south
+from . import coverage, south, celery
