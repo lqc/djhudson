@@ -1,10 +1,9 @@
 from __future__ import division
 from django.test.simple import DjangoTestSuiteRunner
-from django.utils import unittest
+from django.utils import unittest, importlib
 from django.utils.encoding import smart_unicode
 from django_hudson.externals import etree
 from django_hudson.plugins import trigger_plugin_signal
-
 import datetime
 import itertools
 import re
@@ -156,6 +155,10 @@ class HudsonTestSuiteRunner(DjangoTestSuiteRunner):
                 failfast=self.failfast,
                 buffer=kwargs.pop('buffer', False),
                 resultclass=XMLTestResult)
+
+        # make sure global URLs are loaded here
+        from django.conf import settings
+        importlib.import_module(settings.ROOT_URLCONF)
 
         trigger_plugin_signal("before_suite_run", suite)
         result = test_runner.run(suite)
