@@ -6,8 +6,8 @@ import xml.dom
 import re
 import time
 
-from django_hudson.plugins import register, DisablePlugin
-from django_hudson.externals import coverage
+from djhudson.plugins import register, DisablePlugin
+from djhudson.externals import coverage
 from functools import partial
 
 if coverage:
@@ -232,7 +232,7 @@ class CoveragePlugin(object):
         self.coverage_excludes = getattr(settings, 'TEST_COVERAGE_EXCLUDES', [])
 
         def excluded(app):
-            if app.startswith("django_hudson") and not options["X_cover_django_hudson"]:
+            if app.startswith("djhudson") and not options["X_cover_django_hudson"]:
                 return True
             for expr in getattr(settings, 'TEST_EXCLUDES', []):
                 if re.match(expr, app):

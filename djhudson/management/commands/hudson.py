@@ -21,8 +21,8 @@ class Command(BaseCommand):
     def handle(self, *test_labels, **options):
         from django.conf import settings
         from django.test.utils import get_runner
-        from django_hudson.runners import HudsonTestSuiteRunner
-        from django_hudson.plugins import trigger_plugin_signal
+        from djhudson.runners import HudsonTestSuiteRunner
+        from djhudson.plugins import trigger_plugin_signal
 
         verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive', False)
@@ -54,7 +54,7 @@ class Command(BaseCommand):
 
     def create_parser(self, *args):
         # extend the option list with plugin specific options
-        from django_hudson.plugins import get_plugins
+        from djhudson.plugins import get_plugins
         parser = super(Command, self).create_parser(*args)
 
         for plugin in get_plugins():

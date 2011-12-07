@@ -2,8 +2,8 @@ from __future__ import division
 from django.test.simple import DjangoTestSuiteRunner
 from django.utils import unittest, importlib
 from django.utils.encoding import smart_unicode
-from django_hudson.externals import etree
-from django_hudson.plugins import trigger_plugin_signal
+from djhudson.externals import etree
+from djhudson.plugins import trigger_plugin_signal
 import datetime
 import itertools
 import re

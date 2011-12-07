@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8
 
+from __future__ import unicode_literals
 from setuptools import setup, find_packages
 
 setup(
     name='djhudson',
-    version='0.2.2a1',
+    version='0.5.0a1',
     author='Łukasz Rekucki',
     author_email='lrekucki@gmail.com',
     description='Plug and play continuous integration with django and hudson',
@@ -25,8 +26,14 @@ setup(
         'Framework :: Django',
         'Framework :: Django :: 1.3',
     ],
-    packages=['django_hudson', 'django_hudson.management', 'django_hudson.management.commands', 'django_hudson.plugins', 'django_hudson.runners'],
-#     package_data={'django_hudson': ['management/commands/pylint.rc']},
+    packages=[
+        'djhudson',
+        'djhudson.management',
+        'djhudson.management.commands',
+        'djhudson.plugins',
+        'djhudson.runners'
+    ],
+#     package_data={'djhudson': ['management/commands/pylint.rc']},
     zip_safe=False,
     include_package_data=True
 )

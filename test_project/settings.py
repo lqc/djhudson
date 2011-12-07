@@ -84,7 +84,7 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
-    'django_hudson',
+    'djhudson',
     'test_project.simple_app',
     'test_project.excluded_app',
     'test_project.nocover_app',
@@ -94,7 +94,6 @@ try:
     import south
     INSTALLED_APPS = ('south', 'test_project.app_with_south',) + INSTALLED_APPS
 except ImportError:
-    print "No south - not running those tests"
     pass
 
 try:
@@ -102,7 +101,6 @@ try:
     INSTALLED_APPS = ('djcelery', 'test_project.app_with_celery') + INSTALLED_APPS
     CELERY_ALWAYS_EAGER = False
 except ImportError:
-    print "No django-celery, skipping tests."
     pass
 
 TEST_EXCLUDES = (
