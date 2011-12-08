@@ -5,6 +5,7 @@ import time
 
 from xml.etree import ElementTree as etree
 
+
 # This is a bit meta ;)
 class XMLTestResultTestCase(unittest.TestCase):
 
@@ -136,6 +137,7 @@ class XMLTestResultTestCase(unittest.TestCase):
         class SimpleTestCase(unittest.TestCase):
             def test_noisy_stdout(self):
                 print "Hello World!"
+
             def test_noisy_stderr(self):
                 import sys
                 print >> sys.stderr, "Hello World!"

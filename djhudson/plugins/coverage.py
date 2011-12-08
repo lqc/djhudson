@@ -10,11 +10,12 @@ from djhudson.plugins import register, DisablePlugin
 from djhudson.externals import coverage
 from functools import partial
 
+
 if coverage:
     """
         The following XMLReporter code is based on original XMLReporter from
         coverage.py by Ned Batchelder and Cobertura source code[1].
-        
+
         [1]: https://cobertura.svn.sourceforge.net/svnroot/cobertura/trunk/cobertura/src/net/sourceforge/cobertura/reporting/xml/XMLReport.java
     """
     from coverage import __version__ as coverage_version
@@ -45,7 +46,7 @@ if coverage:
 
             document.documentElement.setAttribute("version", coverage_version)
             # Timestamp in milliseconds
-            document.documentElement.setAttribute("timestamp", unicode(int(time.time()*1000)))
+            document.documentElement.setAttribute("timestamp", unicode(int(time.time() * 1000)))
             document.documentElement.setAttribute("complexity", "0")
             return document
 
@@ -87,7 +88,7 @@ if coverage:
             return element
 
         def aggregate_packages(self):
-            lines, branches = [0, 0], [0, 0] # total, hits            
+            lines, branches = [0, 0], [0, 0]  # total, hits
             for package_element, _, classes_map in self.packages_map.itervalues():
                 pkg_lines, pkg_branches = self.aggregate_package(package_element, classes_map)
                 lines[0] += pkg_lines[0]
@@ -112,16 +113,16 @@ if coverage:
 
         def rate(self, total, misses):
             """Return the fraction of `hit`/`num`, as a string."""
-            if not total: return "1"
+            if not total:
+                return "1"
             return "%.4g" % (float(total - misses) / float(total))
 
         def report(self, morfs, outfile=None, config=None):
             """Generate a Cobertura-compatible XML report for `morfs`.
-    
-            `morfs` is a list of modules or filenames.    
+
+            `morfs` is a list of modules or filenames.
             `outfile` is a file object to write the XML to.
             `config` is a CoverageConfig instance.
-    
             """
             self.generate_document(morfs, config)
             outfile = outfile or sys.stdout
@@ -189,7 +190,7 @@ if coverage:
                 classes_element.appendChild(class_element)
 
             branch_stats = analysis.branch_stats()
-            metadata["branches"] = [0, 0] # hit / miss
+            metadata["branches"] = [0, 0]  # hit / miss
 
             # For each statement, create an XML 'line' element.
             for line in analysis.statements:

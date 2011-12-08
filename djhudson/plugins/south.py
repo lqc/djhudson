@@ -1,11 +1,9 @@
-from __future__ import absolute_import
 """
     Plugin to handle django-south_ migrations while testing.
 
     .. _django-south: http://south.aeracode.org/
 """
 from djhudson.plugins import register, DisablePlugin
-
 
 
 @register

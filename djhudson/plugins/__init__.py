@@ -1,3 +1,6 @@
+from django.utils.datastructures import SortedDict
+
+
 __all__ = [
     'get_plugins',
     'register_plugin',
@@ -5,15 +8,17 @@ __all__ = [
     'DisablePlugin'
 ]
 
-from django.utils.datastructures import SortedDict
 
 __plugins = SortedDict()
+
 
 class DisablePlugin(Exception):
     pass
 
+
 def get_plugins():
     return __plugins.values()
+
 
 def register(plugin):
     """
@@ -30,6 +35,7 @@ def register(plugin):
         print "Plugin %s is disabled: %s" % (qname, e.args[0])
     return plugin
 
+
 def trigger_plugin_signal(signal, *args, **kwargs):
     global __plugins
 
@@ -37,6 +43,7 @@ def trigger_plugin_signal(signal, *args, **kwargs):
         callback = getattr(plugin, signal, None)
         if callback is not None:
             callback(*args, **kwargs)
+
 
 # import builtin plugins, this will work, 'cause it's at the end
 from . import coverage, south, celery

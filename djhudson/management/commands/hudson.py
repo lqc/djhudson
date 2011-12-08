@@ -4,6 +4,7 @@ from django.core.management.base import BaseCommand
 from optparse import make_option, OptionGroup
 import sys
 
+
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--noinput', action='store_false', dest='interactive', default=True,
@@ -63,6 +64,3 @@ class Command(BaseCommand):
             if option_group.option_list:
                 parser.add_option_group(option_group)
         return parser
-
-
-
