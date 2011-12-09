@@ -100,8 +100,8 @@ except ImportError:
 TEST_EXCLUDES = (
     r'^test_project\.excluded_app(\.|$)',
     r'^south(\.|$)',
-    r'^django\.'
-    r'^djcelery\.'
+    r'^django\.',
+    r'^djcelery(\.|$)'
 )
 
 TEST_COVERAGE_EXCLUDES = (

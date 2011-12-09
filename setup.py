@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8
 
-from __future__ import unicode_literals
 from setuptools import setup, find_packages
 
 setup(
     name='djhudson',
-    version='0.5.0a1',
-    author='Łukasz Rekucki',
+    version='0.5.0a2',
+    author=u'Łukasz Rekucki',
     author_email='lrekucki@gmail.com',
     description='Plug and play continuous integration with django and hudson',
     license='LGPL',
@@ -22,7 +21,7 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        'Topic :: Software Development :: Testing'
+        'Topic :: Software Development :: Testing',
         'Framework :: Django',
         'Framework :: Django :: 1.3',
     ],
@@ -31,7 +30,7 @@ setup(
         'djhudson.management',
         'djhudson.management.commands',
         'djhudson.plugins',
-        'djhudson.runners'
+        'djhudson.runners',
     ],
 #     package_data={'djhudson': ['management/commands/pylint.rc']},
     zip_safe=False,

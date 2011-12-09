@@ -52,11 +52,10 @@ if coverage:
 
         def create_sources_definition(self):
             self.sources_element = self.create_element("sources")
-            for path in sys.path:
+            for path in self.coverage.config.source:
                 e = self.create_element("source")
                 e.appendChild(self.document.createTextNode(path))
                 self.sources_element.appendChild(e)
-            # self.sources_map = {}
             return self.sources_element
 
         def create_packages_definition(self):
@@ -221,13 +220,6 @@ class CoveragePlugin(object):
             raise DisablePlugin("No coverage module.")
 
     def configure(self, settings, options):
-        self._coverage = coverage.coverage(
-            config_file=options["coverage_config_file"],
-            branch=options["coverage_measure_branch"],
-            # source=settings.INSTALLED_APPS,
-            cover_pylib=False,
-        )
-
         self._output_file = options["coverage_report_file"]
         self._html_dir = options["coverage_html_report_dir"]
         self.coverage_excludes = getattr(settings, 'TEST_COVERAGE_EXCLUDES', [])
@@ -244,7 +236,15 @@ class CoveragePlugin(object):
             return False
         self.cover_apps = set([app for app in settings.INSTALLED_APPS if not excluded(app)])
 
-        # start the coverage now, to cover all imported modules
+        self._sources = set(self.cover_apps) & set(options["coverage_sources"] or settings.INSTALLED_APPS)
+
+        self._coverage = coverage.coverage(
+            config_file=options["coverage_config_file"],
+            branch=options["coverage_measure_branch"],
+            source=self._sources,
+            cover_pylib=False,
+        )
+
         self._coverage.start()
 
     def after_suite_run(self, suite, result):
@@ -286,6 +286,10 @@ class CoveragePlugin(object):
                 dest="coverage_report_file",
                 default="coverage.xml",
                 help="File to which coverage output should be reported. Default: '%default'")
+        group.add_option("--coverage-source",
+                dest="coverage_sources",
+                default=[], action="append",
+                help="Source files packages/directories, which coverage is limited to."),
         group.add_option("--coverage-config",
                 dest="coverage_config_file", default=True,
                 help="Configuration file for coverage module. Default: '%default'.")
