@@ -243,7 +243,7 @@ class CoveragePlugin(object):
             return False
         self.cover_apps = set([app for app in settings.INSTALLED_APPS if not excluded(app)])
 
-    def before_suite_build(self, *args, **kwargs):
+        # start the coverage now, to cover all imported modules
         self._coverage.start()
 
     def after_suite_run(self, suite, result):

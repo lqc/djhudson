@@ -27,9 +27,12 @@ class Command(BaseCommand):
         verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive', False)
         failfast = options.get('failfast', False)
-        TestRunner = get_runner(settings)
 
         trigger_plugin_signal("configure", settings, options)
+
+        # Lookup can import modules, so give coverage-like plugins a chance,
+        # to do something before it.
+        TestRunner = get_runner(settings)
 
         if not issubclass(TestRunner, HudsonTestSuiteRunner):
             TestRunner = type("DynamicHudsonRunner", (HudsonTestSuiteRunner, TestRunner), {})
