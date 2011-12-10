@@ -1,10 +1,8 @@
-from __future__ import absolute_import
 """
     Plugin to handle django-celery:  .. _django-celery: http://pypi.python.org/pypi/django-celery
 """
+from djhudson.plugins import register, DisablePlugin
 
-
-from django_hudson.plugins import register, DisablePlugin
 
 @register
 class CeleryPlugin(object):

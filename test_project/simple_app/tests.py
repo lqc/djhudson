@@ -1,6 +1,7 @@
 # -*- coding: utf-8
 from django.utils import unittest
 
+
 class MetaTests(unittest.TestCase):
     """
         This test case exists only to see how Hudson displays our reports.

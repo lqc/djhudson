@@ -1,15 +1,16 @@
 from django.utils import unittest
-from django_hudson.runners import XMLTestResult
-from cStringIO import StringIO
+from djhudson.runners import XMLTestResult
+from io import BytesIO
 import time
 
 from xml.etree import ElementTree as etree
+
 
 # This is a bit meta ;)
 class XMLTestResultTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.__buffer = StringIO()
+        self.__buffer = BytesIO()
         self.__runner = unittest.TextTestRunner(stream=self.__buffer, resultclass=XMLTestResult)
 
     def run_testcase(self, test_case_class):
@@ -136,6 +137,7 @@ class XMLTestResultTestCase(unittest.TestCase):
         class SimpleTestCase(unittest.TestCase):
             def test_noisy_stdout(self):
                 print "Hello World!"
+
             def test_noisy_stderr(self):
                 import sys
                 print >> sys.stderr, "Hello World!"

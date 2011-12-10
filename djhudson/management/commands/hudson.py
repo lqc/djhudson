@@ -4,6 +4,7 @@ from django.core.management.base import BaseCommand
 from optparse import make_option, OptionGroup
 import sys
 
+
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--noinput', action='store_false', dest='interactive', default=True,
@@ -21,15 +22,18 @@ class Command(BaseCommand):
     def handle(self, *test_labels, **options):
         from django.conf import settings
         from django.test.utils import get_runner
-        from django_hudson.runners import HudsonTestSuiteRunner
-        from django_hudson.plugins import trigger_plugin_signal
+        from djhudson.runners import HudsonTestSuiteRunner
+        from djhudson.plugins import trigger_plugin_signal
 
         verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive', False)
         failfast = options.get('failfast', False)
-        TestRunner = get_runner(settings)
 
         trigger_plugin_signal("configure", settings, options)
+
+        # Lookup can import modules, so give coverage-like plugins a chance,
+        # to do something before it.
+        TestRunner = get_runner(settings)
 
         if not issubclass(TestRunner, HudsonTestSuiteRunner):
             TestRunner = type("DynamicHudsonRunner", (HudsonTestSuiteRunner, TestRunner), {})
@@ -51,7 +55,7 @@ class Command(BaseCommand):
 
     def create_parser(self, *args):
         # extend the option list with plugin specific options
-        from django_hudson.plugins import get_plugins
+        from djhudson.plugins import get_plugins
         parser = super(Command, self).create_parser(*args)
 
         for plugin in get_plugins():
@@ -60,6 +64,3 @@ class Command(BaseCommand):
             if option_group.option_list:
                 parser.add_option_group(option_group)
         return parser
-
-
-

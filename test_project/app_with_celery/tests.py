@@ -7,6 +7,7 @@ Replace this with more appropriate tests for your application.
 
 from django.test import TestCase
 
+
 class CeleryTest(TestCase):
 
     def test_settings(self):

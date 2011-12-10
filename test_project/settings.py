@@ -3,20 +3,14 @@
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-ADMINS = (
-    # ('Your Name', 'your_email@domain.com'),
-)
+ADMINS = ()
 
 MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': ':memory:', # Or path to database file if using sqlite3.
-        'USER': '', # Not used with sqlite3.
-        'PASSWORD': '', # Not used with sqlite3.
-        'HOST': '', # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '', # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
     }
 }
 
@@ -84,7 +78,7 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
-    'django_hudson',
+    'djhudson',
     'test_project.simple_app',
     'test_project.excluded_app',
     'test_project.nocover_app',
@@ -94,7 +88,6 @@ try:
     import south
     INSTALLED_APPS = ('south', 'test_project.app_with_south',) + INSTALLED_APPS
 except ImportError:
-    print "No south - not running those tests"
     pass
 
 try:
@@ -102,14 +95,13 @@ try:
     INSTALLED_APPS = ('djcelery', 'test_project.app_with_celery') + INSTALLED_APPS
     CELERY_ALWAYS_EAGER = False
 except ImportError:
-    print "No django-celery, skipping tests."
     pass
 
 TEST_EXCLUDES = (
     r'^test_project\.excluded_app(\.|$)',
     r'^south(\.|$)',
-    r'^django\.'
-    r'^djcelery\.'
+    r'^django\.',
+    r'^djcelery(\.|$)'
 )
 
 TEST_COVERAGE_EXCLUDES = (

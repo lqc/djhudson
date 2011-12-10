@@ -2,14 +2,16 @@ from __future__ import division
 from django.test.simple import DjangoTestSuiteRunner
 from django.utils import unittest, importlib
 from django.utils.encoding import smart_unicode
-from django_hudson.externals import etree
-from django_hudson.plugins import trigger_plugin_signal
+from djhudson.externals import etree
+from djhudson.plugins import trigger_plugin_signal
 import datetime
 import itertools
 import re
 
+
 def total_seconds(td):
     return (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10 ** 6) / 10 ** 6
+
 
 class XMLTestResult(unittest.TextTestResult):
 
@@ -118,6 +120,7 @@ class XMLTestResult(unittest.TextTestResult):
                 testcase.append(failure)
             failure.text = smart_unicode(traceback)
 
+
 def flattened_suite(suite):
     for item in suite:
         if hasattr(item, "id"):
@@ -125,6 +128,7 @@ def flattened_suite(suite):
         else:
             for subitem in flattened_suite(item):
                 yield subitem
+
 
 class HudsonTestSuiteRunner(DjangoTestSuiteRunner):
     def __init__(self, *args, **kwargs):
