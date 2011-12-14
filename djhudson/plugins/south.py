@@ -3,6 +3,7 @@
 
     .. _django-south: http://south.aeracode.org/
 """
+from __future__ import absolute_import
 from djhudson.plugins import register, DisablePlugin
 
 
