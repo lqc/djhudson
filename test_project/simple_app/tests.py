@@ -10,9 +10,11 @@ class MetaTests(unittest.TestCase):
     def test_meta_success(self):
         self.assertTrue(True)
 
+    @unittest.expectedFailure
     def test_nonascii_string_failue(self):
         raise Exception("Gąska i Gżegżółka")
 
+    @unittest.expectedFailure 
     def test_nonascii_string_assert(self):
         self.fail("Gąska i Gżegżółka")
 
@@ -36,5 +38,6 @@ class BrokenTestCase(unittest.TestCase):
     def setUp(self):
         raise Exception("Unexpected error")
 
+    @unittest.expectedFailure
     def test_unreachable(self):
         self.fail("Test was run, but setUp should have raises an error")
