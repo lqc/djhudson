@@ -10,14 +10,6 @@ class MetaTests(unittest.TestCase):
     def test_meta_success(self):
         self.assertTrue(True)
 
-    @unittest.expectedFailure
-    def test_nonascii_string_failue(self):
-        raise Exception("Gąska i Gżegżółka")
-
-    @unittest.expectedFailure 
-    def test_nonascii_string_assert(self):
-        self.fail("Gąska i Gżegżółka")
-
     @unittest.skip("This test is skipped!")
     def test_meta_skipping(self):
         # this test will fail, but it will never be runned
