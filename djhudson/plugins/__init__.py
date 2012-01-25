@@ -1,4 +1,5 @@
 from django.utils.datastructures import SortedDict
+import importlib
 
 
 __all__ = [
@@ -9,7 +10,13 @@ __all__ = [
 ]
 
 
-__plugins = SortedDict()
+DEFAULT_PLUGINS = (
+    "djhudson.plugins.coverage.CoveragePlugin",
+    "djhudson.plugins.celery.CeleryPlugin",
+    "djhudson.plugins.south.SouthPlugin",
+)
+
+__plugins = None
 
 
 class DisablePlugin(Exception):
@@ -17,33 +24,31 @@ class DisablePlugin(Exception):
 
 
 def get_plugins():
-    return __plugins.values()
+    global __plugins
+    if __plugins is not None:
+        return __plugins
+    # Initialize plugins
+    from django.conf import settings
+    plugin_classes = getattr(settings, "DJHUDSON_PLUGINS", DEFAULT_PLUGINS)
+    __plugins = []
+    for path in plugin_classes:
+        modpath, class_name = path.rsplit(".", 1)
+        mod = importlib.import_module(modpath, package=None)
+        try:
+            __plugins.append(getattr(mod, class_name)())
+        except DisablePlugin:
+            pass
+    return __plugins
 
 
 def register(plugin):
-    """
-        Class decorator for registering plugins.
-    """
-    global __plugins
-
-    qname = plugin.__module__ + '.' + plugin.__name__
-    if qname in __plugins:
-        raise ValueError("Test plugin '%s' already registered" % qname)
-    try:
-        __plugins[qname] = plugin()
-    except DisablePlugin, e:
-        print "Plugin %s is disabled: %s" % (qname, e.args[0])
+    # Deprecated - does nothing
     return plugin
 
 
 def trigger_plugin_signal(signal, *args, **kwargs):
     global __plugins
-
-    for plugin in __plugins.itervalues():
+    for plugin in __plugins:
         callback = getattr(plugin, signal, None)
         if callback is not None:
             callback(*args, **kwargs)
-
-
-# import builtin plugins, this will work, 'cause it's at the end
-from . import coverage, south, celery
