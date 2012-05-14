@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='djhudson',
-    version='0.5.1',
+    version='0.6.0',
     author=u'Łukasz Rekucki',
     author_email='lrekucki@gmail.com',
     description='Plug and play continuous integration with django and hudson',

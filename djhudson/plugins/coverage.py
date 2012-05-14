@@ -31,8 +31,8 @@ if coverage:
         # The Schema seems very incomplete, so omit it
         # COBERTURA_SCHEMA = "http://cobertura.sourceforge.net/xml/coverage.xsd"
 
-        def __init__(self, coverage, ignore_errors=False):
-            super(CoberturaCoverageReporter, self).__init__(coverage, ignore_errors)
+        def __init__(self, coverage, config):
+            super(CoberturaCoverageReporter, self).__init__(coverage, config)
             self.arcs = coverage.data.has_arcs()
 
         def create_document(self):
@@ -116,24 +116,24 @@ if coverage:
                 return "1"
             return "%.4g" % (float(total - misses) / float(total))
 
-        def report(self, morfs, outfile=None, config=None):
+        def report(self, morfs, outfile=None):
             """Generate a Cobertura-compatible XML report for `morfs`.
 
             `morfs` is a list of modules or filenames.
             `outfile` is a file object to write the XML to.
             `config` is a CoverageConfig instance.
             """
-            self.generate_document(morfs, config)
+            self.generate_document(morfs)
             outfile = outfile or sys.stdout
             outfile.write(self.document.toprettyxml())
 
-        def generate_document(self, morfs, config):
+        def generate_document(self, morfs):
             self.document = self.create_document()
             self.coverage_element = self.document.documentElement
             self.coverage_element.appendChild(self.create_sources_definition())
             self.coverage_element.appendChild(self.create_packages_definition())
 
-            self.report_files(self.report_code_unit, morfs, config)
+            self.report_files(self.report_code_unit, morfs)
 
             # append packages in ordered fashion
             for _, info in sorted(self.packages_map.iteritems(), key=lambda x: x[0]):
@@ -254,11 +254,8 @@ class CoveragePlugin(object):
 
         with open(self._coverage.config.xml_output, "wb") as outfile:
             reporter = CoberturaCoverageReporter(self._coverage,
-                                             self._coverage.config.ignore_errors)
-            reporter.report(modules,
-                outfile=outfile,
-                config=self._coverage.config
-            )
+                                             self._coverage.config)
+            reporter.report(modules, outfile=outfile)
 
         if self._html_dir:
             self._coverage.html_report(modules, directory=self._html_dir)
